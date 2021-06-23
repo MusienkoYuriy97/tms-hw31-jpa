@@ -23,11 +23,11 @@ public class UserService {
         if (userDao.existByUsername(userRegistrationDto.getUsername())){
             throw new RuntimeException("User with the same username already exist");
         }
-        User user = fillUser(0,
-                userRegistrationDto.getUsername(),
+        User user = new User(0,
                 userRegistrationDto.getName(),
+                userRegistrationDto.getUsername(),
                 userRegistrationDto.getPassword(),
-                fillAddress(0, userRegistrationDto.getStreet()
+                new Address(0, userRegistrationDto.getStreet()
                         , userRegistrationDto.getHome())
         );
         userDao.save(user);
@@ -46,11 +46,12 @@ public class UserService {
             if (userDao.existByUsername(userUpdateDto.getUsername())){
                 throw new RuntimeException("User with the same username already exist");
             }
-            User user = fillUser(userUpdateDto.getId(),
-                    userUpdateDto.getUsername(),
+
+            User user = new User(userUpdateDto.getId(),
                     userUpdateDto.getName(),
+                    userUpdateDto.getUsername(),
                     userUpdateDto.getPassword(),
-                    fillAddress(0, userUpdateDto.getStreet()
+                    new Address(0, userUpdateDto.getStreet()
                             , userUpdateDto.getHome())
             );
             userDao.update(user);
@@ -67,28 +68,11 @@ public class UserService {
         }
     }
 
-    private User fillUser(long id, String username, String name, String password, Address address){
-        User user = new User();
-        user.setId(id);
-        user.setUsername(username);
-        user.setName(name);
-        user.setPassword(password);
-        user.setAddress(address);
-        return user;
-    }
-
-    private Address fillAddress(long id, String street, int home){
-        Address address = new Address();
-        address.setStreet(street);
-        address.setHome(home);
-        return address;
-    }
-
     public void mergeAddress(long id, String street, int home) {
         Optional<User> byId = userDao.getById(id);
         if (byId.isPresent()){
             User user = byId.get();
-            user.setAddress(fillAddress(0, street, home));
+            user.setAddress(new Address(0, street, home));
             userDao.update(user);
         }else {
             throw new RuntimeException("There is not user with this id");
